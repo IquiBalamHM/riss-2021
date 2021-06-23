@@ -2,7 +2,7 @@
 import numpy as np
 import argparse
 import cv2
-
+#test
 # define the list of boundaries
 lowerblue = np.array([75, 79, 107])
 higherblue = np.array([103,151,155])
@@ -21,6 +21,7 @@ class HandClass:
     lines = np.hstack([pts,np.roll(pts,-1,axis=0)])
     area = 0.5*abs(sum(x1*y2-x2*y1 for x1,y1,x2,y2 in lines))
     return area
+    
   def __init__(self, centerlist):
     if (len(centerlist[0]) + len(centerlist[1]) + len(centerlist[2]))==3:
       self.flag = True  
