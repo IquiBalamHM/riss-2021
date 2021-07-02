@@ -1,6 +1,7 @@
 from __future__ import print_function
 import cv2 as cv
 import argparse
+from Camera import *
 max_value = 255
 max_value_H = 360//2
 low_H = 0
@@ -56,7 +57,7 @@ def on_high_V_thresh_trackbar(val):
 parser = argparse.ArgumentParser(description='Code for Thresholding Operations using inRange tutorial.')
 parser.add_argument('--camera', help='Camera divide number.', default=0, type=int)
 args = parser.parse_args()
-cap = cv.VideoCapture(args.camera)
+#cap = cv.VideoCapture(args.camera)
 cv.namedWindow(window_capture_name)
 cv.namedWindow(window_detection_name)
 cv.createTrackbar(low_H_name, window_detection_name , low_H, max_value_H, on_low_H_thresh_trackbar)
@@ -65,9 +66,11 @@ cv.createTrackbar(low_S_name, window_detection_name , low_S, max_value, on_low_S
 cv.createTrackbar(high_S_name, window_detection_name , high_S, max_value, on_high_S_thresh_trackbar)
 cv.createTrackbar(low_V_name, window_detection_name , low_V, max_value, on_low_V_thresh_trackbar)
 cv.createTrackbar(high_V_name, window_detection_name , high_V, max_value, on_high_V_thresh_trackbar)
+camera = Camera("Intel")
 while True:
     
-    ret, frame = cap.read()
+    #ret, frame = cap.read()
+    ret,frame = camera.getFrame()
     if frame is None:
         break
     frame_HSV = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
