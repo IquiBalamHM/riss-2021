@@ -231,8 +231,8 @@ class DemoRope(App):
             game.draw.circle(self.screen, (255, 255, 255), pos, 8, 0)
         
 
-        print("x" + str(x))
-        print("y"+ str(y))
+        #print("x" + str(x))
+        #print("y"+ str(y))
         tempfit = CurveFit(x,y,1)
 
         # define the RGB value for white,

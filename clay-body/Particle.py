@@ -20,7 +20,7 @@ class Particle:
     previous     = Vector(0.0, 0.0)  # previous time-step [t-dt] position
     velocity     = Vector(0.0, 0.0)  # [readme] particle velocity
     acceleration = Vector(0.0, 0.0)  # acceleration of the particle
-
+    dampfactor = Vector(0.0,0.0)
 
     # Class constructor. Initialize the particle within the simulation world.
     #
@@ -49,9 +49,10 @@ class Particle:
     def Simulate(self):
         if not self.material.mass:
             return
+        damping = 1
         self.velocity = 2.0 * self.position - self.previous
         self.previous = self.position
-        self.position = self.velocity + self.acceleration * self.world.delta**2.0
+        self.position = self.velocity*damping + self.acceleration * self.world.delta**2.0
         self.velocity = self.position - self.previous
         self.acceleration = Vector.zero()
 

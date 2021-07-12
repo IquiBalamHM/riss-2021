@@ -55,12 +55,24 @@ class Constraint:
         D = self.node2.position - self.node1.position
         F = 0.5 * self.stiff * (D.length() - self.target) * D.normalized()
         if self.node1.material.mass != 0.0 and not self.node2.material.mass:
-            self.node1.ApplyImpulse(2.0 * +F)
+            self.node1.ApplyImpulse(2 * +F)
         elif not self.node1.material.mass and self.node2.material.mass != 0.0:
-            self.node2.ApplyImpulse(2.0 * -F)
+            self.node2.ApplyImpulse(2 * -F)
         else:
             self.node1.ApplyImpulse(+F)
             self.node2.ApplyImpulse(-F)
+
+    def Relax2(self):
+            #
+            D = self.node2.position - self.node1.position
+            F = 0.5 * self.stiff * (D.length() - self.target) * D.normalized()
+            if self.node1.material.mass != 0.0 and not self.node2.material.mass:
+                self.node1.ApplyImpulse(2 * +F)
+            elif not self.node1.material.mass and self.node2.material.mass != 0.0:
+                self.node2.ApplyImpulse(2 * -F)
+            else:
+                self.node1.ApplyImpulse(+F)
+                self.node2.ApplyImpulse(-F)
 
     def StopConstraint(self):
         D = self.node2.position - self.node1.position

@@ -46,7 +46,7 @@ class DemoRope(App):
     radius   = 15
     strength = 0.1
     #camera selection
-    cameraString = 'Intel'
+    cameraString = 'WebCam'
     #
     def Initialize(self):
         #
@@ -246,10 +246,14 @@ class DemoRope(App):
         # on which text is drawn on it.
         text = font.render(tempfit.function, True, green, blue)
         #game.draw.arc(self.screen, (255,0,0), tempfit.ellipserect,  tempfit.startangle, tempfit.endangle,3)
-        for l in range(len(tempfit.x_line)-1):
-            pos1 = (int(tempfit.x_line[l]), int(tempfit.y_line[l]))
-            pos2 = (int(tempfit.x_line[l+1]), int(tempfit.y_line[l+1]))
+        
+        for l in range(len(tempfit.x_parabolic)-1):
+            pos1 = (int(tempfit.x_parabolic[l]), int(tempfit.y_parabolic[l]))
+            pos2 = (int(tempfit.x_parabolic[l+1]), int(tempfit.y_parabolic[l+1]))
             game.draw.line(self.screen, (255, 0, 0), pos1, pos2, 3)
+            #game.draw.circle(self.screen, (255, 0, 0), pos1, 1, 0)
+        #print("x3 ="+str(tempfit.x_line))
+        #print("y3 = " +str(tempfit.y_line))
         # create a rectangular object for the
         # text surface object
         textRect = text.get_rect()

@@ -40,7 +40,6 @@ class DemoRope(App):
     def Initialize(self):
         #
         rope = self.world.AddComposite()
-        self.cap = cv2.VideoCapture(0)
 
         mat = Material(1.0,1.0,1.0)
         rope.AddParticles(
@@ -164,28 +163,18 @@ class DemoRope(App):
             fullcenters = []
             fullcenters.append(maskgreen.centers)
             #fullcenters.append(maskyellow.centers)
-            self.hand1 = HandClassOneColor(fullcenters)
+            hand1 = HandClassOneColor(fullcenters)
             #print(len(fullcenters[0]))
             font = cv2.FONT_HERSHEY_PLAIN
-            if self.hand1.numberofFingers == 3:
-                print(str(self.hand1.area) + ' ' +str(self.hand1.state))
-                cv2.putText(inputimage, 'Hand'+ str(self.hand1.state), (image_width-200,25), font, 2, (120,120,0), 3)
-                print(self.hand1.centerTriangle)
+            if hand1.numberofFingers == 3:
+                print(str(hand1.area) + ' ' +str(hand1.state))
+                cv2.putText(inputimage, 'Hand'+ str(hand1.state), (image_width-200,25), font, 2, (120,120,0), 3)
             else: 
                 cv2.putText(inputimage, 'Not Right Hand', (image_width-300,25), font, 2, (120,120,0), 3)  
 
             masksum = maskgreen.tagged
             #
-            self.cv_inputimage = inputimage
-            self.cv_masksumimage = masksum
-            self.cv_greenfiltered = maskgreen.tagged
 
-            
-            
-            cv2.imshow('input-image',self.cv_inputimage)
-            bin = cv2.waitKey(5)
-            
-            cv2.imshow('gree-filter',self.cv_greenfiltered)
         if game.key.get_pressed()[game.K_ESCAPE]:
             self.Exit()
 
@@ -197,14 +186,12 @@ class DemoRope(App):
         for c in self.world.constraints:
             pos1 = (int(c.node1.position.x), int(c.node1.position.y))
             pos2 = (int(c.node2.position.x), int(c.node2.position.y))
-            game.draw.line(self.screen, (255, 255, 0), pos1, pos2, 4)
+            game.draw.line(self.screen, (255, 0, 0), pos1, pos2, 4)
         for p in self.world.particles:
             pos = (int(p.position.x), int(p.position.y))
             game.draw.circle(self.screen, (255, 255, 255), pos, 8, 0)
-        if self.hand1.numberofFingers == 3 and self.hand1.state=='Closed':
-            game.draw.circle(self.screen, (0, 255, 0), self.hand1.centerTriangle, 8, 0)
-        elif self.hand1.numberofFingers == 3 and self.hand1.state=='Open':
-            game.draw.circle(self.screen, (255, 0, 0), self.hand1.centerTriangle, 8, 0)
+        cv2.imshow('input',self.inputimage)
+        #cv2.imshow('sum',masksum)
         game.display.update()
 
 
@@ -224,12 +211,14 @@ if __name__ == "__main__":
     print ("Starting...")
     app = DemoRope("Swinging Rope", 640, 480, 30)
     app.Run()
+    #cv2.imshow('post',inputimage)
+    #cv2.imshow('sum',masksum)
+    bin = cv2.waitKey(5)
+    if bin & 0xFF == ord('q'):
+        print('exit')
+    elif bin & 0xFF ==ord('s'):
+        print('save')
 
-    #if bin & 0xFF == ord('q'):
-    #    print('exit')
-    #elif bin & 0xFF ==ord('s'):
-    #    print('save')
-
-    #self.cap.release()
+    cap.release()
     # loop over the boundaries
     print ("Ending...")

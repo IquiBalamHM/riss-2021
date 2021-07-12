@@ -2,7 +2,7 @@ from numpy import arange
 from pandas import read_csv
 from scipy.optimize import curve_fit
 from matplotlib import pyplot
-
+from Fits import *
 # define the true objective function
 def objectiveOne(x, a, b):
     return a * x + b
@@ -30,7 +30,7 @@ class CurveFit():
         popt, _ = curve_fit(objectiveTwo, self.x, self.y)
         # summarize the parameter values
         a, b, c = popt
-        print('y = %.5f * x + %.5f * x^2 + %.5f' % (a, b, c))
+        print('y =  %.5f * x^2 + %.5f * x + %.5f' % (b,a, c))
         # plot input vs output
         pyplot.scatter(self.x, self.y)
         # define a sequence of inputs between the smallest and largest known inputs

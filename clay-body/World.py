@@ -59,7 +59,7 @@ class World:
                 particle.Restrain()
                 particle.ResetForces()
             for constraint in self.constraints:
-                constraint.Relax()
+                constraint.Relax2()
 
     def SimulateWorldStop(self):
         for i in range(self.step):
