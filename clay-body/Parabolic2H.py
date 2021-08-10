@@ -2,6 +2,7 @@
 import numpy as np
 import argparse
 import cv2
+from numpy.core.numeric import full
 
 from HandClasses import *
 
@@ -9,7 +10,7 @@ import pygame as game
 
 from App import *
 from VerletPhysics import *
-
+from Fits import *
 from Camera import *
 # define the list of boundaries
 lowerblue = np.array([75, 79, 107])
@@ -27,6 +28,15 @@ highergreen = np.array([80,156,255])
 lowernewgreen = np.array([59,48,163])
 highernewgreen = np.array([94,176,255])
 
+todaylowgreen = np.array([55,237,67])
+todayhighgreen = np.array([107,255,227])
+
+todaylowgreen = np.array([64,163,88])
+todayhighgreen = np.array([107,255,249])
+
+todaylowyellow = np.array([20,66,114])
+todayhighyellow = np.array([56,173,255])
+
 #lowernewgreen = np.array([57,41,231])
 #highernewgreen = np.array([93,140,255])
 
@@ -40,7 +50,7 @@ class DemoRope(App):
     radius   = 15
     strength = 0.1
     #camera selection
-    cameraString = 'WebCam'
+    cameraString = 'Intel'
     #
     def Initialize(self):
         #
@@ -137,6 +147,16 @@ class DemoRope(App):
                 self.grabbed.ApplyImpulse(force)
                 #print('here2')        
             self.world.Simulate()
+        elif game.mouse.get_pressed()[0]:
+            if self.grabbed == None:
+                closest = self.ClosestPoint()
+                if closest[1] < self.radius:
+                    self.grabbed = closest[0]
+            if self.grabbed != None:
+                mouse = Vector(game.mouse.get_pos()[0], game.mouse.get_pos()[1])
+                force = (mouse - self.grabbed.position) * self.strength
+                self.grabbed.ApplyImpulse(force)
+            self.world.Simulate()
         else:
             if self.grabbed != None:
                 self.world.SimulateWorldStop() 
@@ -163,35 +183,44 @@ class DemoRope(App):
             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
             frame_HSV = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
             image_height, image_width, _ = image.shape
-            maskgreen = MaskClass(frame_HSV.copy(),lowernewgreen,highernewgreen)
+            maskgreen = MaskClass(frame_HSV.copy(),todaylowgreen,todayhighgreen)
+            maskyellow = MaskClass(frame_HSV.copy(),todaylowyellow,todayhighyellow)
+            maskyellow.process()
             maskgreen.process()
             #cv2.imshow('green',maskgreen.tagged)
             
             fullcenters = []
             fullcenters.append(maskgreen.centers)
+            fullcenters2 = []
+            fullcenters2.append(maskyellow.centers)
             #fullcenters.append(maskyellow.centers)
             self.hand1 = HandClassOneColor(fullcenters)
+            self.hand2 = HandClassOneColor(fullcenters2)
             #print(len(fullcenters[0]))
             font = cv2.FONT_HERSHEY_PLAIN
             if self.hand1.numberofFingers == 3:
-                print(str(self.hand1.area) + ' ' +str(self.hand1.state))
+                #print(str(self.hand1.area) + ' ' +str(self.hand1.state))
                 cv2.putText(inputimage, 'Hand'+ str(self.hand1.state), (image_width-200,25), font, 2, (120,120,0), 3)
-                print(self.hand1.centerTriangle)
+                #print(self.hand1.centerTriangle)
             else: 
                 cv2.putText(inputimage, 'Not Right Hand', (image_width-300,25), font, 2, (120,120,0), 3)  
+            if self.hand2.numberofFingers == 3:
+                #print(str(self.hand1.area) + ' ' +str(self.hand1.state))
+                cv2.putText(inputimage, 'Hand'+ str(self.hand2.state), (20,25), font, 2, (120,120,0), 3)
+                #print(self.hand1.centerTriangle)
+            else: 
+                cv2.putText(inputimage, 'Not Left Hand', (20,25), font, 2, (120,120,0), 3)  
 
-            masksum = maskgreen.tagged
+            masksum = maskgreen.tagged + maskyellow.tagged
             #
             self.cv_inputimage = inputimage
             self.cv_masksumimage = masksum
-            self.cv_greenfiltered = maskgreen.tagged
-
-            
+            self.cv_greenfiltered = maskyellow.tagged + maskgreen.tagged
             
             cv2.imshow('input-image',self.cv_inputimage)
             bin = cv2.waitKey(5)
             
-            cv2.imshow('gree-filter',self.cv_greenfiltered)
+            cv2.imshow('green-filter',self.cv_greenfiltered)
         if game.key.get_pressed()[game.K_ESCAPE]:
             self.Exit()
 
@@ -204,19 +233,66 @@ class DemoRope(App):
             pos1 = (int(c.node1.position.x), int(c.node1.position.y))
             pos2 = (int(c.node2.position.x), int(c.node2.position.y))
             game.draw.line(self.screen, (255, 255, 0), pos1, pos2, 4)
+        game.draw.line(self.screen, (130, 130, 130), (self.world.hsize.x,20), (self.world.hsize.x,460), 3)
+        game.draw.line(self.screen, (130, 130, 130), (20,self.world.hsize.y), (620,self.world.hsize.y), 3)
+        y = []
+        x = []
         for p in self.world.particles:
             pos = (int(p.position.x), int(p.position.y))
+            x.append(p.position.x-self.world.hsize.x)
+            y.append(p.position.y*-1+self.world.hsize.y)
             game.draw.circle(self.screen, (255, 255, 255), pos, 8, 0)
+        #print("x="+str(x))
+        #print("y="+str(y))
+        tempfit = CurveFit(x,y,2)
+
+        # define the RGB value for white,
+        #  green, blue colour .
+        white = (255, 255, 255)
+        green = (0, 255, 0)
+        blue = (0, 0, 128)
+        # create a font object.
+        # 1st parameter is the font file
+        # which is present in pygame.
+        # 2nd parameter is size of the font
+        font = game.font.Font('freesansbold.ttf', 15)
+        
+        # create a text surface object,
+        # on which text is drawn on it.
+        text = font.render(tempfit.function, True, green, blue)
+        #game.draw.arc(self.screen, (255,0,0), tempfit.ellipserect,  tempfit.startangle, tempfit.endangle,3)
+        
+        for l in range(len(tempfit.x_parabolic)-1):
+            pos1 = (int(tempfit.x_parabolic[l]), int(tempfit.y_parabolic[l]))
+            pos2 = (int(tempfit.x_parabolic[l+1]), int(tempfit.y_parabolic[l+1]))
+            game.draw.line(self.screen, (255, 0, 0), pos1, pos2, 3)
+            #game.draw.circle(self.screen, (255, 0, 0), pos1, 1, 0)
+        #print("x3 ="+str(tempfit.x_line))
+        #print("y3 = " +str(tempfit.y_line))
+        # create a rectangular object for the
+        # text surface object
+        textRect = text.get_rect()
+
+        # set the center of the rectangular object.
+        textRect.center = (500, 20)
+
+        # copying the text surface object
+        # to the display surface object
+        # at the center coordinate.
+        self.screen.blit(text, textRect)
+
         if self.hand1.numberofFingers == 3 and self.hand1.state=='Closed':
             game.draw.circle(self.screen, (0, 255, 0), self.hand1.centerTriangle, 8, 0)
         elif self.hand1.numberofFingers == 3 and self.hand1.state=='Open':
             game.draw.circle(self.screen, (255, 0, 0), self.hand1.centerTriangle, 8, 0)
         game.display.update()
 
-
     #
     def ClosestPoint(self):
-        mouse    = Vector(self.hand1.centerTriangle[0],self.hand1.centerTriangle[1])
+        if game.mouse.get_pressed()[0]:
+            mouse    = Vector(game.mouse.get_pos()[0], game.mouse.get_pos()[1])
+        else:
+            mouse    = Vector(self.hand1.centerTriangle[0],self.hand1.centerTriangle[1])
         closest  = None
         distance = float('inf')
         for particle in self.world.particles:

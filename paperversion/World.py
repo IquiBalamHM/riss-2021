@@ -24,7 +24,9 @@ class World:
     constraints = list()            # list of all constraints being simulated
     composites  = list()            # list of all composite shapes being simulated
 
-    
+    count = 0
+
+
     # Class constructor. Initialize the simulation world. Set global constants.
     #
     # @param    s   simulation world size
@@ -41,6 +43,12 @@ class World:
         else:
             self.step  = t
             self.delta = 1.0 / self.step
+        self.reset()
+
+    def reset(self):
+        self.particles   = list()            # list of all particles being simulated
+        self.constraints = list()            # list of all constraints being simulated
+        self.composites  = list()            # list of all composite shapes being simulated
 
 
     # Simulate a number of time steps on our simulation world. For each time step, we satisfy
@@ -58,10 +66,12 @@ class World:
                 particle.Simulate()
                 particle.Restrain()
                 particle.ResetForces()
-            #for constraint in self.constraints:
-                #constraint.Relax2()
+            for constraint in self.constraints:
+                constraint.Relax2()
 
     def SimulateWorldStop(self):
+        #print("stop" + str(self.count))
+        self.count+=1
         for i in range(self.step):
             for particle in self.particles:
                 particle.StopParticleMotion()
@@ -101,6 +111,11 @@ class World:
     # @return   Composite   object reference of the new composite
     #
     def AddComposite(self, *params):
+        composite = Composite(params)
+        self.composites.append(composite)
+        return composite
+    
+    def resetcomposite(self,*params):
         composite = Composite(params)
         self.composites.append(composite)
         return composite

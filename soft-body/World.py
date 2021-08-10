@@ -24,7 +24,7 @@ class World:
     constraints = list()            # list of all constraints being simulated
     composites  = list()            # list of all composite shapes being simulated
 
-    
+
     # Class constructor. Initialize the simulation world. Set global constants.
     #
     # @param    s   simulation world size
@@ -58,16 +58,10 @@ class World:
                 particle.Simulate()
                 particle.Restrain()
                 particle.ResetForces()
-            #for constraint in self.constraints:
-                #constraint.Relax2()
-
-    def SimulateWorldStop(self):
-        for i in range(self.step):
-            for particle in self.particles:
-                particle.StopParticleMotion()
-                particle.ResetForces()
             for constraint in self.constraints:
-                constraint.StopConstraint()
+                constraint.Relax()
+
+
 
     # Create and add a particle to the simulation world.
     #
