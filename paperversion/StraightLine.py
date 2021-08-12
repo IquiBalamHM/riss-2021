@@ -11,38 +11,13 @@ from App import *
 from VerletPhysics import *
 from Fits import *
 from Camera import *
+
 # define the list of boundaries
-lowerblue = np.array([75, 79, 107])
-higherblue = np.array([103,151,155])
+todaylowRight = np.loadtxt('lowRight.txt', dtype=int)
+todayhighRight = np.loadtxt('highRight.txt', dtype=int)
 
-loweryellow = np.array([29,58,146])
-higheryellow = np.array([74,115,240])
-
-lowerpurple = np.array([110,35,150])
-higherpurple = np.array([159,147,218])
-
-lowergreen = np.array([47,41,135])
-highergreen = np.array([80,156,255])
-
-lowernewgreen = np.array([59,48,163])
-highernewgreen = np.array([94,176,255])
-
-todaylowgreen = np.array([55,237,67])
-todayhighgreen = np.array([107,255,227])
-
-todaylowgreen = np.array([64,163,88])
-todayhighgreen = np.array([107,255,249])
-
-todaylowgreen = np.array([46,81,52])
-todayhighgreen = np.array([90,255,255])
-
-#todaylowyellow = np.array([])
-#todayhighyellow = np.array([])
-#lowernewgreen = np.array([57,41,231])
-#highernewgreen = np.array([93,140,255])
-
-
-
+todaylowLeft = np.loadtxt('lowLeft.txt', dtype=int)
+todayhighLeft = np.loadtxt('highLeft.txt', dtype=int)
 class DemoRope(App):
     #
     world    = World(Vector(640.0, 480.0), Vector(0, 0), 4)
@@ -129,37 +104,45 @@ class DemoRope(App):
             frame_HSV = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
             image_height, image_width, _ = image.shape
             
-            maskgreen = MaskClass(frame_HSV.copy(),todaylowgreen,todayhighgreen)
-            maskgreen.process()
+            maskRight = MaskClass(frame_HSV.copy(),todaylowRight,todayhighRight)
+            maskRight.process()
             #cv2.imshow('green',maskgreen.tagged)
             
-            #maskyellow = MaskClass(frame_HSV=frame_HSV.copy(),todaylowyellow,todayhighyellow)
-
-            fullcenters = []
-            fullcenters.append(maskgreen.centers)
-            #fullcenters.append(maskyellow.centers)
-            self.hand1 = HandClassOneColor(fullcenters)
+            maskLeft = MaskClass(frame_HSV.copy(),todaylowLeft,todayhighLeft)
+            maskLeft.process()
             
-            #self.hand2 = 
-            #print(len(fullcenters[0]))
+            handRightcenters = []
+            handRightcenters.append(maskRight.centers)
+            self.handRight = HandClassOneColor(handRightcenters)
+
+            handLeftcenters = []
+            handLeftcenters.append(maskLeft.centers)
+            self.handLeft = HandClassOneColor(handLeftcenters)
+
             font = cv2.FONT_HERSHEY_PLAIN
-            if self.hand1.numberofFingers == 3:
+            if self.handRight.numberofFingers == 3:
                 #print(str(self.hand1.area) + ' ' +str(self.hand1.state))
-                cv2.putText(inputimage, 'Hand'+ str(self.hand1.state), (image_width-200,25), font, 2, (120,120,0), 3)
+                cv2.putText(inputimage, 'Hand'+ str(self.handRight.state), (image_width-200,25), font, 2, (120,120,0), 3)
                 #print(self.hand1.centerTriangle)
             else: 
                 cv2.putText(inputimage, 'Not Right Hand', (image_width-300,25), font, 2, (120,120,0), 3)  
-
-            masksum = maskgreen.tagged
+            
+            if self.handLeft.numberofFingers == 3:
+                #print(str(self.hand1.area) + ' ' +str(self.hand1.state))
+                cv2.putText(inputimage, 'Hand'+ str(self.handLeft.state), (image_width-200,25), font, 2, (120,120,0), 3)
+            else: 
+                cv2.putText(inputimage, 'Not Left Hand', (image_width-300,25), font, 2, (120,120,0), 3)  
+            
+            masksum = maskRight.tagged 
             #
             self.cv_inputimage = inputimage
             self.cv_masksumimage = masksum
-            self.cv_greenfiltered = maskgreen.tagged
+            self.cv_Rightfiltered = maskRight.tagged
             
             cv2.imshow('input-image',self.cv_inputimage)
             bin = cv2.waitKey(5)
             
-            cv2.imshow('gree-filter',self.cv_greenfiltered)
+            cv2.imshow('right-filter',self.cv_greenfiltered)
         if game.key.get_pressed()[game.K_ESCAPE]:
             self.Exit()
 
@@ -227,12 +210,16 @@ class DemoRope(App):
         textRect3.center = (300, 10)
         self.screen.blit(text3, textRect3)
 
-        if self.hand1.numberofFingers == 3 and self.hand1.state=='Closed':
-            game.draw.circle(self.screen, (0, 255, 0), self.hand1.centerTriangle, 8, 0)
-        elif self.hand1.numberofFingers == 3 and self.hand1.state=='Open':
-            game.draw.circle(self.screen, (255, 0, 0), self.hand1.centerTriangle, 8, 0)
+        if self.handRight.numberofFingers == 3 and self.handRight.state=='Closed':
+            game.draw.circle(self.screen, (0, 255, 0), self.handRight.centerTriangle, 8, 0)
+        elif self.handRight.numberofFingers == 3 and self.handRight.state=='Open':
+            game.draw.circle(self.screen, (255, 0, 0), self.handRight.centerTriangle, 8, 0)
         game.display.update()
 
+        if self.handRight.centerTriangle[0] < self.handLeft.centerTriangle[0]:
+            self.gestureReset = True
+        else:
+            self.gestureReset = False
     #
     def ClosestPoint(self):
         if game.mouse.get_pressed()[0]:

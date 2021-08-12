@@ -18,6 +18,8 @@ class App:
     flags     = game.HWSURFACE | game.DOUBLEBUF # hardware acceleration and double buffering
     framerate = 30                              # application frame rate
     cameraSelection = ''
+    
+    resetGesture = False
     # Class constructor. Initialize the Pygame window with a title, position, and frame rate.
     #
     # @param    t   application title
@@ -81,7 +83,7 @@ class App:
         if event.type == game.QUIT:
             self.running = False
         elif event.type == game.KEYDOWN:
-            if event.key == game.K_r:
+            if event.key == game.K_r or self.resetGesture == True:
                 print("Reset")
                 self.Reset()
             elif event.key == game.K_l:
