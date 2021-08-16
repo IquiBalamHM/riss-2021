@@ -1,6 +1,7 @@
 from __future__ import print_function
 import cv2 as cv
 import argparse
+from Camera import *
 max_value = 255
 max_value_H = 360//2
 low_H = 0
@@ -17,6 +18,9 @@ low_V_name = 'Low V'
 high_H_name = 'High H'
 high_S_name = 'High S'
 high_V_name = 'High V'
+save = 0
+save_name = 'Save Values'
+
 def on_low_H_thresh_trackbar(val):
     global low_H
     global high_H
@@ -53,10 +57,35 @@ def on_high_V_thresh_trackbar(val):
     high_V = val
     high_V = max(high_V, low_V+1)
     cv.setTrackbarPos(high_V_name, window_detection_name, high_V)
+def on_high_V_thresh_trackbar(val):
+    global low_V
+    global high_V
+    high_V = val
+    high_V = max(high_V, low_V+1)
+    cv.setTrackbarPos(high_V_name, window_detection_name, high_V)
+
+def on_save_trackbar(val):
+    global save
+    save = val
+    cv.setTrackbarPos(save_name, window_detection_name, save)
+
+def savevalues(namelow,namehigh):
+    global low_H
+    global low_S
+    global low_V
+    global high_H
+    global high_S
+    global high_V
+    low = np.array([low_H,low_S,low_V])
+    np.savetxt(namelow, low, fmt='%d')
+    high = np.array([high_H,high_S,high_V])
+    np.savetxt(namehigh, high, fmt='%d')
+
+
 parser = argparse.ArgumentParser(description='Code for Thresholding Operations using inRange tutorial.')
 parser.add_argument('--camera', help='Camera divide number.', default=0, type=int)
 args = parser.parse_args()
-cap = cv.VideoCapture(args.camera)
+#cap = cv.VideoCapture(args.camera)
 cv.namedWindow(window_capture_name)
 cv.namedWindow(window_detection_name)
 cv.createTrackbar(low_H_name, window_detection_name , low_H, max_value_H, on_low_H_thresh_trackbar)
@@ -65,9 +94,14 @@ cv.createTrackbar(low_S_name, window_detection_name , low_S, max_value, on_low_S
 cv.createTrackbar(high_S_name, window_detection_name , high_S, max_value, on_high_S_thresh_trackbar)
 cv.createTrackbar(low_V_name, window_detection_name , low_V, max_value, on_low_V_thresh_trackbar)
 cv.createTrackbar(high_V_name, window_detection_name , high_V, max_value, on_high_V_thresh_trackbar)
+cv.createTrackbar(save_name,window_detection_name,save,2,on_save_trackbar)
+camera = Camera("Intel")
+print('Save in 1 : will save the green boundaries')
+print('Save in 2 : will save the yellow boundaries')
 while True:
     
-    ret, frame = cap.read()
+    #ret, frame = cap.read()
+    ret,frame = camera.getFrame()
     if frame is None:
         break
     frame_HSV = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
@@ -76,7 +110,11 @@ while True:
     
     cv.imshow(window_capture_name, frame)
     cv.imshow(window_detection_name, frame_threshold)
-    
+
+    if(save == 1):
+        savevalues('lowgreen','highgreen')
+    if(save == 2):
+        savevalues('lowyellow','highyellow')
     key = cv.waitKey(30)
     if key == ord('q') or key == 27:
         break
