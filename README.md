@@ -27,7 +27,7 @@ pip install requirements.txt
 ## Running the Code
 The first step is to calibrate the colors of the glove using the calibration script provided. Inside the script, move the sliders to match the desired filter colors.
 ```sh
-python3 paperversion/Calibration.py
+python3 paperversion/Calibration.py --camera Web-Cam
 ```
 Move the last slider to save the colors 
 - 1 for right hand colors.
@@ -37,6 +37,6 @@ Colors will be automatically saved when you close the script.
 
 To run the simulations do it as:
 ```sh
-python3 paperversion/Parabola.py -camera Web-Cam
+python3 paperversion/Parabola.py --camera Web-Cam
 ```
 That's it, enjoy the interface.
