@@ -37,6 +37,6 @@ Colors will be automatically saved when you close the script.
 
 To run the simulations do it as:
 ```sh
-python3 paperversion/Parabola.py
+python3 paperversion/Parabola.py -camera Web-Cam
 ```
 That's it, enjoy the interface.
