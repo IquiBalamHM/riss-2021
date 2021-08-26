@@ -13,7 +13,13 @@ AlgeGloes require python 3.8.
 Install the dependencies and packages using the requirements file.
 
 We suggest you to create a [conda](https://docs.anaconda.com/anaconda/install/) environment to have your work more organized.
-After you have successfully installed conda, the next step is to create an environment.   
+After you have successfully installed conda, the next step is to create an environment and activate it. In linux, type:
+
+```sh
+conda create -n envRiss21 python=3
+source activate envRiss21
+```
+Then, you may install the requirements needed for the project.
 ```sh
 pip install requirements.txt
 ```
