@@ -12,12 +12,14 @@ from VerletPhysics import *
 from Fits import *
 from Camera import *
 # define the list of boundaries
-todaylowRight = np.loadtxt('lowRight.txt', dtype=int)
-todayhighRight = np.loadtxt('highRight.txt', dtype=int)
+todaylowRight = np.loadtxt('lowRight', dtype=int)
+todayhighRight = np.loadtxt('highRight', dtype=int)
 
-todaylowLeft = np.loadtxt('lowLeft.txt', dtype=int)
-todayhighLeft = np.loadtxt('highLeft.txt', dtype=int)
+todaylowLeft = np.loadtxt('lowLeft', dtype=int)
+todayhighLeft = np.loadtxt('highLeft', dtype=int)
 
+parser = argparse.ArgumentParser(description='A test program.')
+parser.add_argument("--camera", help="Select the camera from: Web-Cam/Intel", default= "Web-Cam")
 
 class DemoRope(App):
     #
@@ -27,9 +29,11 @@ class DemoRope(App):
     grabbed  = None
     radius   = 15
     strength = 0.1
+    args = parser.parse_args()
 
-    #camera selection
-    cameraString = 'Intel'
+    print(args.camera)
+    #camera selection Web-Cam/Intel
+    cameraString = args.camera
     camera = Camera(cameraString)
 
     segments = 300

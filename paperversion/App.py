@@ -86,10 +86,11 @@ class App:
             if event.key == game.K_r or self.resetGesture == True:
                 print("Reset")
                 self.Reset()
-            elif event.key == game.K_l:
-                print("Change to line!")
+            elif event.key == game.K_d:
+                print("Right")
                 self.simulation = 'Line'
-            elif event.key == game.K_p:
+            elif event.key == game.K_a:
+                print("Left")
                 self.simulation = 'Parabolic'
                 print("Change to parabolic!")
             elif event.key == game.K_s:

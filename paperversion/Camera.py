@@ -1,5 +1,4 @@
 import cv2
-import pyrealsense2 as rs
 import numpy as np
 class Camera:
     def stop(self):
@@ -20,18 +19,15 @@ class Camera:
                 success = False
             else:
                 success = True
-
             # Convert images to numpy arrays
             color_image = np.asanyarray(color_frame.get_data())
-
             # Apply colormap on depth image (image must be converted to 8-bit per pixel first)
-              
             return success,color_image
 
     def __init__(self,selection = "WebCam"):
         if selection== 'Intel':
             self.camera = 'Intel'
-
+            import pyrealsense2 as rs
             # Configure depth and color streams
             self.pipeline = rs.pipeline()
             config = rs.config()
