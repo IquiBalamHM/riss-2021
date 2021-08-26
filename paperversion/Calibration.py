@@ -82,10 +82,6 @@ def savevalues(namelow,namehigh):
     np.savetxt(namehigh, high, fmt='%d')
 
 
-parser = argparse.ArgumentParser(description='Code for Thresholding Operations using inRange tutorial.')
-parser.add_argument('--camera', help='Camera divide number.', default=0, type=int)
-args = parser.parse_args()
-#cap = cv.VideoCapture(args.camera)
 cv.namedWindow(window_capture_name)
 cv.namedWindow(window_detection_name)
 cv.createTrackbar(low_H_name, window_detection_name , low_H, max_value_H, on_low_H_thresh_trackbar)
@@ -95,7 +91,15 @@ cv.createTrackbar(high_S_name, window_detection_name , high_S, max_value, on_hig
 cv.createTrackbar(low_V_name, window_detection_name , low_V, max_value, on_low_V_thresh_trackbar)
 cv.createTrackbar(high_V_name, window_detection_name , high_V, max_value, on_high_V_thresh_trackbar)
 cv.createTrackbar(save_name,window_detection_name,save,2,on_save_trackbar)
-camera = Camera("Intel")
+
+parser = argparse.ArgumentParser(description='A test program.')
+parser.add_argument("--camera", help="Select the camera from: Web-Cam/Intel", default= "Web-Cam")
+
+args = parser.parse_args()
+
+cameraString = args.camera
+camera = Camera(cameraString)
+
 print('Save in 1 : will save the Right hand boundaries')
 print('Save in 2 : will save the Left boundaries')
 while True:
